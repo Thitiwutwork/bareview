@@ -50,6 +50,7 @@ export const Review: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<string>(productIdParam || '');
 
   // Form states
+  const [reviewerName, setReviewerName] = useState<string>('');
   const [rating, setRating] = useState<number>(5);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -89,10 +90,10 @@ export const Review: React.FC = () => {
             return;
           }
 
-          // User must match token user
-          if (user && user.id !== tokenResult.user_id) {
-            setVerificationError('คุณไม่มีสิทธิ์เข้าถึง Token นี้ (เป็นของบัญชีอื่น)');
-            return;
+          if (tokenResult.customer_name) {
+            setReviewerName(tokenResult.customer_name);
+          } else if (user) {
+            setReviewerName(user.user_metadata?.full_name || '');
           }
 
           const eligible = (tokenResult.items || []).filter((item: any) => !item.has_reviewed);
@@ -246,6 +247,7 @@ export const Review: React.FC = () => {
         rating: data.rating,
         comment: data.comment,
         imageUrl: uploadedImageUrl,
+        reviewerName: reviewerName.trim() || undefined,
       });
     } else if (orderIdParam) {
       // Submit via verified RPC
@@ -400,6 +402,25 @@ export const Review: React.FC = () => {
               </div>
             )}
 
+            {/* Reviewer Name Input */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-slate-700">
+                  ชื่อผู้รีวิว (ชื่อแสดงในรีวิวของคุณ)
+                </label>
+                {tokenParam && (
+                  <span className="text-[11px] text-pink-600 font-medium">สิทธิ์ลูกค้าซื้อจริงผ่าน LINE</span>
+                )}
+              </div>
+              <input
+                type="text"
+                value={reviewerName}
+                onChange={(e) => setReviewerName(e.target.value)}
+                placeholder="เช่น น้องมุก, คุณเอ, ลูกค้า LINE"
+                className="w-full text-sm rounded-xl border border-slate-300 p-3 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+            </div>
+
             {/* Rating Stars Input */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-700">
@@ -433,7 +454,7 @@ export const Review: React.FC = () => {
                 {...register('comment')}
                 rows={4}
                 placeholder="บอกเล่าประสบการณ์การใช้งาน คุณภาพสินค้า หรือความประทับใจ..."
-                className="w-full text-sm rounded-xl border border-slate-300 p-3.5 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full text-sm rounded-xl border border-slate-300 p-3.5 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
               {errors.comment && (
                 <p className="text-xs text-rose-500">{errors.comment.message}</p>

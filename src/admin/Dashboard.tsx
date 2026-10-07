@@ -98,13 +98,23 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-          ภาพรวมระบบ & สถิติ (Admin Analytics)
-        </h1>
-        <p className="text-xs text-slate-500 mt-1">
-          สรุปข้อมูลลูกค้า คำสั่งซื้อ รีวิวที่ผ่านการรับรอง และสถานะความปลอดภัย
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            ภาพรวมระบบ & สถิติ (Admin Analytics)
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            สรุปข้อมูลลูกค้า คำสั่งซื้อ รีวิวที่ผ่านการรับรอง และสถานะความปลอดภัย
+          </p>
+        </div>
+
+        <a
+          href="/admin/tokens"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-pink-200 transition-colors"
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>ออกรหัสรีวิวให้ลูกค้า (LINE @)</span>
+        </a>
       </div>
 
       {/* 6 Key Metrics Cards */}

@@ -47,10 +47,13 @@ CREATE TABLE IF NOT EXISTS public.products (
 );
 
 -- 2.3 Orders Table
+-- 2.3 Orders Table
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number TEXT UNIQUE NOT NULL,
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    customer_name TEXT,
+    notes TEXT,
     total_amount NUMERIC(10, 2) NOT NULL CHECK (total_amount >= 0),
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'processing', 'completed', 'cancelled')),
     payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded')),
@@ -71,7 +74,8 @@ CREATE TABLE IF NOT EXISTS public.order_items (
 -- 2.5 Reviews Table
 CREATE TABLE IF NOT EXISTS public.reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    customer_name TEXT,
     product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
     order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
@@ -88,7 +92,8 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 CREATE TABLE IF NOT EXISTS public.review_tokens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    customer_name TEXT,
     token TEXT UNIQUE NOT NULL,
     expires_at TIMESTAMPTZ NOT NULL,
     used BOOLEAN NOT NULL DEFAULT FALSE,
@@ -398,6 +403,127 @@ BEGIN
 END;
 $$;
 
+-- 🎫 Admin issues review token for customer ordering via LINE @
+CREATE OR REPLACE FUNCTION public.admin_issue_line_token(
+    p_product_id UUID,
+    p_customer_name TEXT,
+    p_order_number TEXT DEFAULT NULL,
+    p_notes TEXT DEFAULT NULL,
+    p_days INTEGER DEFAULT 7
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_admin_id UUID;
+    v_product RECORD;
+    v_order_id UUID;
+    v_order_num TEXT;
+    v_token TEXT;
+    v_expires_at TIMESTAMPTZ;
+BEGIN
+    v_admin_id := auth.uid();
+    IF v_admin_id IS NULL OR NOT public.is_admin() THEN
+        RAISE EXCEPTION 'Access Denied: Only administrators can issue review tokens.';
+    END IF;
+
+    -- Fetch Product
+    SELECT id, name, price INTO v_product
+    FROM public.products
+    WHERE id = p_product_id;
+
+    IF v_product IS NULL THEN
+        RAISE EXCEPTION 'Product not found.';
+    END IF;
+
+    -- Order Number
+    IF p_order_number IS NOT NULL AND length(trim(p_order_number)) > 0 THEN
+        v_order_num := trim(p_order_number);
+    ELSE
+        v_order_num := 'LINE-' || to_char(now(), 'YYMMDD') || '-' || upper(substring(encode(gen_random_bytes(3), 'hex') from 1 for 5));
+    END IF;
+
+    -- Create Completed Order in Database (Transaction Proof)
+    INSERT INTO public.orders (
+        order_number,
+        user_id,
+        customer_name,
+        notes,
+        total_amount,
+        status,
+        payment_status,
+        completed_at
+    )
+    VALUES (
+        v_order_num,
+        v_admin_id,
+        trim(p_customer_name),
+        p_notes,
+        v_product.price,
+        'completed',
+        'paid',
+        now()
+    )
+    RETURNING id INTO v_order_id;
+
+    -- Insert Order Item
+    INSERT INTO public.order_items (
+        order_id,
+        product_id,
+        quantity,
+        price
+    )
+    VALUES (
+        v_order_id,
+        v_product.id,
+        1,
+        v_product.price
+    );
+
+    -- Generate Token (48-char cryptographically random)
+    v_token := encode(gen_random_bytes(24), 'hex');
+    v_expires_at := now() + (COALESCE(p_days, 7) || ' days')::interval;
+
+    -- Insert Review Token
+    INSERT INTO public.review_tokens (
+        order_id,
+        user_id,
+        customer_name,
+        token,
+        expires_at,
+        used
+    )
+    VALUES (
+        v_order_id,
+        v_admin_id,
+        trim(p_customer_name),
+        v_token,
+        v_expires_at,
+        FALSE
+    );
+
+    -- Audit Log
+    INSERT INTO public.audit_logs (user_id, action, description)
+    VALUES (
+        v_admin_id,
+        'ADMIN_ISSUE_TOKEN',
+        'Issued LINE review token for customer: ' || coalesce(p_customer_name, 'Unknown') || ' (Order: ' || v_order_num || ', Product: ' || v_product.name || ')'
+    );
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'token', v_token,
+        'order_id', v_order_id,
+        'order_number', v_order_num,
+        'product_name', v_product.name,
+        'customer_name', trim(p_customer_name),
+        'expires_at', v_expires_at
+    );
+END;
+$$;
+
 -- Verify review token and retrieve order details
 CREATE OR REPLACE FUNCTION public.verify_review_token(
     p_token TEXT
@@ -411,7 +537,7 @@ DECLARE
     v_record RECORD;
     v_items JSONB;
 BEGIN
-    SELECT rt.id, rt.order_id, rt.user_id, rt.expires_at, rt.used,
+    SELECT rt.id, rt.order_id, rt.user_id, rt.customer_name, rt.expires_at, rt.used,
            o.order_number, o.status AS order_status
     INTO v_record
     FROM public.review_tokens rt
@@ -427,7 +553,7 @@ BEGIN
     END IF;
 
     IF v_record.expires_at < now() THEN
-        RETURN jsonb_build_object('valid', false, 'error', 'Token expired: This review link has expired (7 days validity).');
+        RETURN jsonb_build_object('valid', false, 'error', 'Token expired: This review link has expired.');
     END IF;
 
     IF v_record.order_status <> 'completed' THEN
@@ -457,6 +583,7 @@ BEGIN
         'order_id', v_record.order_id,
         'order_number', v_record.order_number,
         'user_id', v_record.user_id,
+        'customer_name', v_record.customer_name,
         'expires_at', v_record.expires_at,
         'items', COALESCE(v_items, '[]'::jsonb)
     );
@@ -469,7 +596,8 @@ CREATE OR REPLACE FUNCTION public.create_review_with_token(
     p_product_id UUID,
     p_rating INTEGER,
     p_comment TEXT,
-    p_image_url TEXT DEFAULT NULL
+    p_image_url TEXT DEFAULT NULL,
+    p_reviewer_name TEXT DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -478,10 +606,14 @@ SET search_path = public
 AS $$
 DECLARE
     v_token_record RECORD;
-    v_res JSONB;
+    v_user_id UUID;
+    v_customer_name TEXT;
+    v_review_id UUID;
+    v_item_exists BOOLEAN;
+    v_already_reviewed BOOLEAN;
 BEGIN
     -- Verify token
-    SELECT id, order_id, user_id, expires_at, used
+    SELECT id, order_id, user_id, customer_name, expires_at, used
     INTO v_token_record
     FROM public.review_tokens
     WHERE token = p_token;
@@ -490,27 +622,87 @@ BEGIN
         RAISE EXCEPTION 'Invalid, expired, or already used review token.';
     END IF;
 
-    -- User must be logged in as the token owner
-    IF auth.uid() <> v_token_record.user_id THEN
-        RAISE EXCEPTION 'Access Denied: This token was issued for a different account.';
+    -- Rating check
+    IF p_rating < 1 OR p_rating > 5 THEN
+        RAISE EXCEPTION 'Invalid rating: Rating must be between 1 and 5.';
     END IF;
 
-    -- Create review using main verification function
-    v_res := public.create_verified_review(p_product_id, v_token_record.order_id, p_rating, p_comment, p_image_url);
-
-    -- Mark token as used if all items in order have been reviewed
-    IF NOT EXISTS (
-        SELECT 1 FROM public.order_items oi
-        WHERE oi.order_id = v_token_record.order_id
-        AND NOT EXISTS (
-            SELECT 1 FROM public.reviews r
-            WHERE r.order_id = v_token_record.order_id AND r.product_id = oi.product_id
-        )
-    ) THEN
-        UPDATE public.review_tokens SET used = TRUE WHERE id = v_token_record.id;
+    -- Comment check
+    IF p_comment IS NULL OR length(trim(p_comment)) = 0 THEN
+        RAISE EXCEPTION 'Comment cannot be empty.';
     END IF;
 
-    RETURN v_res;
+    -- Check product is inside order
+    SELECT EXISTS (
+        SELECT 1 FROM public.order_items
+        WHERE order_id = v_token_record.order_id AND product_id = p_product_id
+    ) INTO v_item_exists;
+
+    IF NOT v_item_exists THEN
+        RAISE EXCEPTION 'Cannot review: Product is not part of this order.';
+    END IF;
+
+    -- Check already reviewed
+    SELECT EXISTS (
+        SELECT 1 FROM public.reviews
+        WHERE order_id = v_token_record.order_id AND product_id = p_product_id
+    ) INTO v_already_reviewed;
+
+    IF v_already_reviewed THEN
+        RAISE EXCEPTION 'Already reviewed: You have already reviewed this product.';
+    END IF;
+
+    -- Determine author information
+    v_user_id := auth.uid();
+    v_customer_name := COALESCE(
+        NULLIF(trim(p_reviewer_name), ''),
+        v_token_record.customer_name,
+        (SELECT full_name FROM public.profiles WHERE id = v_user_id),
+        'ลูกค้า BA STORE'
+    );
+
+    -- Insert Review: is_verified = TRUE enforced by database transaction proof!
+    INSERT INTO public.reviews (
+        user_id,
+        customer_name,
+        product_id,
+        order_id,
+        rating,
+        comment,
+        image_url,
+        is_verified,
+        status
+    )
+    VALUES (
+        v_user_id,
+        v_customer_name,
+        p_product_id,
+        v_token_record.order_id,
+        p_rating,
+        trim(p_comment),
+        p_image_url,
+        TRUE, -- Enforced by database transaction verification!
+        'published'
+    )
+    RETURNING id INTO v_review_id;
+
+    -- Mark token as used
+    UPDATE public.review_tokens SET used = TRUE WHERE id = v_token_record.id;
+
+    -- Insert audit log
+    INSERT INTO public.audit_logs (user_id, action, description)
+    VALUES (
+        v_user_id,
+        'CREATE_REVIEW_VIA_TOKEN',
+        'Created verified review for product ' || p_product_id || ' using token (Review ID: ' || v_review_id || ')'
+    );
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'review_id', v_review_id,
+        'is_verified', true,
+        'message', 'Verified review published successfully.'
+    );
 END;
 $$;
 

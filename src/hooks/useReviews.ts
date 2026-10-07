@@ -56,6 +56,7 @@ export function useReviews() {
     rating: number;
     comment: string;
     imageUrl?: string | null;
+    reviewerName?: string | null;
   }) => {
     setIsSubmitting(true);
     setError(null);
@@ -67,6 +68,7 @@ export function useReviews() {
         p_rating: params.rating,
         p_comment: params.comment.trim(),
         p_image_url: params.imageUrl || null,
+        p_reviewer_name: params.reviewerName?.trim() || null,
       });
 
       if (rpcError) {
@@ -76,6 +78,42 @@ export function useReviews() {
       return { success: true, data };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'ไม่สามารถบันทึกรีวิวผ่าน Token ได้';
+      setError(msg);
+      return { success: false, error: msg };
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  /**
+   * Admin issues review token for customer ordering via LINE @
+   */
+  const adminIssueLineToken = async (params: {
+    productId: string;
+    customerName: string;
+    orderNumber?: string;
+    notes?: string;
+    days?: number;
+  }) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const { data, error: rpcError } = await supabase.rpc('admin_issue_line_token', {
+        p_product_id: params.productId,
+        p_customer_name: params.customerName.trim(),
+        p_order_number: params.orderNumber?.trim() || null,
+        p_notes: params.notes?.trim() || null,
+        p_days: params.days || 7,
+      });
+
+      if (rpcError) {
+        throw new Error(rpcError.message);
+      }
+
+      return { success: true, data };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'ไม่สามารถออกรหัสรีวิวได้';
       setError(msg);
       return { success: false, error: msg };
     } finally {
@@ -196,6 +234,7 @@ export function useReviews() {
     error,
     submitVerifiedReview,
     submitReviewByToken,
+    adminIssueLineToken,
     updateReview,
     deleteReview,
     adminReply,

@@ -32,7 +32,9 @@ export interface Product {
 export interface Order {
   id: string;
   order_number: string;
-  user_id: string;
+  user_id: string | null;
+  customer_name?: string | null;
+  notes?: string | null;
   total_amount: number;
   status: OrderStatus;
   payment_status: PaymentStatus;
@@ -55,7 +57,8 @@ export interface OrderItem {
 
 export interface Review {
   id: string;
-  user_id: string;
+  user_id: string | null;
+  customer_name?: string | null;
   product_id: string;
   order_id: string;
   rating: number;
@@ -74,7 +77,8 @@ export interface Review {
 export interface ReviewToken {
   id: string;
   order_id: string;
-  user_id: string;
+  user_id: string | null;
+  customer_name?: string | null;
   token: string;
   expires_at: string;
   used: boolean;

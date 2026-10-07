@@ -9,7 +9,8 @@ import {
   Flag, 
   Users, 
   ArrowLeft,
-  Lock
+  Lock,
+  QrCode
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner } from '../components/Loading';
@@ -50,6 +51,7 @@ export const AdminLayout: React.FC = () => {
 
   const navLinks = [
     { to: '/admin', label: 'ภาพรวม & สถิติ', icon: LayoutDashboard, exact: true },
+    { to: '/admin/tokens', label: 'ออกรหัสรีวิว (LINE)', icon: QrCode },
     { to: '/admin/products', label: 'จัดการสินค้า', icon: ShoppingBag },
     { to: '/admin/orders', label: 'คำสั่งซื้อ', icon: Package },
     { to: '/admin/reviews', label: 'จัดการรีวิว', icon: MessageSquare },

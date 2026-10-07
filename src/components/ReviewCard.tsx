@@ -27,7 +27,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   const [showFullImage, setShowFullImage] = useState(false);
 
   const isOwner = user && user.id === review.user_id;
-  const authorName = review.profiles?.full_name || 'ลูกค้าผู้ใช้งานจริง';
+  const authorName = review.customer_name || review.profiles?.full_name || 'ลูกค้าผู้ใช้งานจริง';
   const purchaseDate = review.orders?.completed_at || review.orders?.created_at;
   const reviewDate = review.created_at;
 

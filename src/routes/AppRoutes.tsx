@@ -22,6 +22,7 @@ import { AdminOrders } from '../admin/Orders';
 import { AdminReviews } from '../admin/Reviews';
 import { AdminReports } from '../admin/Reports';
 import { AdminUsers } from '../admin/Users';
+import { AdminTokens } from '../admin/Tokens';
 
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -85,6 +86,7 @@ export const AppRoutes: React.FC = () => {
         }
       >
         <Route index element={<AdminDashboard />} />
+        <Route path="tokens" element={<AdminTokens />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="reviews" element={<AdminReviews />} />
