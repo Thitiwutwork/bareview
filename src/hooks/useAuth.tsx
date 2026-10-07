@@ -12,7 +12,11 @@ interface AuthContextType {
   isAdmin: boolean;
   isConfigured: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string, 
+    password: string, 
+    fullName: string
+  ) => Promise<{ data?: any; error: Error | null; needsEmailConfirmation?: boolean }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -128,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!isConfigured) {
       return { error: new Error('Supabase is not configured yet. Please set your credentials in .env') };
     }
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -137,7 +141,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       },
     });
-    return { error: error as Error | null };
+    const needsEmailConfirmation = Boolean(data?.user && !data?.session);
+    return { data, error: error as Error | null, needsEmailConfirmation };
   };
 
   const signOut = async () => {

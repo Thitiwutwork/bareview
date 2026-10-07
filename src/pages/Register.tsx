@@ -41,15 +41,26 @@ export const Register: React.FC = () => {
     setSuccessMessage(null);
 
     try {
-      const { error } = await signUp(data.email, data.password, data.fullName);
+      const { error, needsEmailConfirmation } = await signUp(data.email, data.password, data.fullName);
       if (error) {
-        setErrorMessage(error.message);
+        if (error.message.includes('User already registered')) {
+          setErrorMessage('อีเมลนี้มีผู้ใช้งานในระบบแล้ว กรุณาใช้เข้าสู่ระบบ');
+        } else {
+          setErrorMessage(error.message);
+        }
         return;
       }
-      setSuccessMessage('สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังหน้าแดชบอร์ด...');
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1500);
+
+      if (needsEmailConfirmation) {
+        setSuccessMessage(
+          'สมัครสมาชิกสำเร็จ! โปรดทราบ: Supabase ของคุณเปิดระบบยืนยันอีเมลไว้ (Confirm email) กรุณาตรวจสอบอีเมลของคุณเพื่อกดยืนยัน หรือปิด Confirm email ใน Supabase Dashboard (Authentication > Providers > Email) แล้วจึงเข้าสู่ระบบ'
+        );
+      } else {
+        setSuccessMessage('สมัครสมาชิกสำเร็จแล้ว! กำลังนำคุณไปยังหน้าแดชบอร์ด...');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      }
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลงทะเบียน');
     } finally {

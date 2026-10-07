@@ -36,7 +36,17 @@ export const Login: React.FC = () => {
     try {
       const { error } = await signIn(data.email, data.password);
       if (error) {
-        setErrorMessage(error.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+        if (error.message.includes('Email not confirmed')) {
+          setErrorMessage(
+            'อีเมลนี้ยังไม่ได้ยืนยัน (Email not confirmed): กรุณาตรวจสอบลิงก์ในกล่องข้อความอีเมลของคุณ หรือปิด "Confirm email" ใน Supabase Dashboard (ไปที่ Authentication > Providers > Email > ปิด Confirm email) หรือกดยืนยันผู้ใช้ในเมนู Authentication > Users'
+          );
+        } else if (error.message.includes('Invalid login credentials')) {
+          setErrorMessage(
+            'อีเมลหรือรหัสผ่านไม่ถูกต้อง (หากเพิ่งสมัครและโปรเจกต์เปิดการยืนยันอีเมลไว้ อาจต้องกดยืนยันในอีเมลก่อน)'
+          );
+        } else {
+          setErrorMessage(error.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
+        }
         return;
       }
       navigate(from, { replace: true });
@@ -51,18 +61,18 @@ export const Login: React.FC = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center mx-auto shadow-inner">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">เข้าสู่ระบบ</h1>
+          <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">เข้าสู่ระบบ</h1>
           <p className="text-xs text-slate-500">
             ระบบตรวจสอบสิทธิ์รีวิวเฉพาะลูกค้าที่มีรายการซื้อจริง
           </p>
         </div>
 
         {errorMessage && (
-          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2 leading-relaxed">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{errorMessage}</span>
           </div>
         )}
