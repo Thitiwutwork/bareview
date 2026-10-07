@@ -7,16 +7,16 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 2. Clean Drop (For idempotent script execution)
--- DROP TABLE IF EXISTS audit_logs CASCADE;
--- DROP TABLE IF EXISTS review_replies CASCADE;
--- DROP TABLE IF EXISTS review_reports CASCADE;
--- DROP TABLE IF EXISTS review_tokens CASCADE;
--- DROP TABLE IF EXISTS reviews CASCADE;
--- DROP TABLE IF EXISTS order_items CASCADE;
--- DROP TABLE IF EXISTS orders CASCADE;
--- DROP TABLE IF EXISTS products CASCADE;
--- DROP TABLE IF EXISTS profiles CASCADE;
+-- 2. Clean Drop existing tables with CASCADE (Resolves incompatible types from old tables)
+DROP TABLE IF EXISTS public.audit_logs CASCADE;
+DROP TABLE IF EXISTS public.review_replies CASCADE;
+DROP TABLE IF EXISTS public.review_reports CASCADE;
+DROP TABLE IF EXISTS public.review_tokens CASCADE;
+DROP TABLE IF EXISTS public.reviews CASCADE;
+DROP TABLE IF EXISTS public.order_items CASCADE;
+DROP TABLE IF EXISTS public.orders CASCADE;
+DROP TABLE IF EXISTS public.products CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
 
 -- ==============================================================================
 -- TABLE DEFINITIONS
@@ -676,24 +676,30 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage RLS: Public read for all 3 buckets
+DROP POLICY IF EXISTS "Public Read product-images" ON storage.objects;
 CREATE POLICY "Public Read product-images" ON storage.objects FOR SELECT
     USING (bucket_id = 'product-images');
 
+DROP POLICY IF EXISTS "Public Read review-images" ON storage.objects;
 CREATE POLICY "Public Read review-images" ON storage.objects FOR SELECT
     USING (bucket_id = 'review-images');
 
+DROP POLICY IF EXISTS "Public Read avatars" ON storage.objects;
 CREATE POLICY "Public Read avatars" ON storage.objects FOR SELECT
     USING (bucket_id = 'avatars');
 
 -- Admin can upload/delete product-images
+DROP POLICY IF EXISTS "Admin Upload product-images" ON storage.objects;
 CREATE POLICY "Admin Upload product-images" ON storage.objects FOR INSERT
     WITH CHECK (bucket_id = 'product-images' AND public.is_admin());
 
 -- Authenticated users can upload review-images (up to 5MB, JPG/PNG/WEBP)
+DROP POLICY IF EXISTS "Auth User Upload review-images" ON storage.objects;
 CREATE POLICY "Auth User Upload review-images" ON storage.objects FOR INSERT
     WITH CHECK (bucket_id = 'review-images' AND auth.role() = 'authenticated');
 
 -- Authenticated users can upload avatars
+DROP POLICY IF EXISTS "Auth User Upload avatars" ON storage.objects;
 CREATE POLICY "Auth User Upload avatars" ON storage.objects FOR INSERT
     WITH CHECK (bucket_id = 'avatars' AND auth.role() = 'authenticated');
 
