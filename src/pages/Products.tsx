@@ -1,22 +1,46 @@
 import React, { useState, useMemo } from 'react';
-import { Search, ShoppingBag } from 'lucide-react';
+import { Search, ShoppingBag, Sparkles } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import { ProductCard } from '../components/ProductCard';
 import { ProductSkeleton, EmptyState, ErrorState } from '../components/Loading';
 
+const CATEGORIES = ['ทั้งหมด', 'ซีรีส์ / หนัง', 'ฟังเพลง', 'ทำงาน / AI'];
+
 export const Products: React.FC = () => {
   const { products, isLoading, error, refetch } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('ทั้งหมด');
   const [sortBy, setSortBy] = useState<'latest' | 'rating' | 'price-asc' | 'price-desc'>('latest');
 
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
         const term = searchTerm.toLowerCase();
-        return (
+        const matchSearch =
           p.name.toLowerCase().includes(term) ||
-          (p.description && p.description.toLowerCase().includes(term))
-        );
+          (p.description && p.description.toLowerCase().includes(term));
+
+        let matchCategory = true;
+        if (selectedCategory !== 'ทั้งหมด') {
+          if (selectedCategory === 'ฟังเพลง') {
+            matchCategory = p.name.includes('YouTube') || p.name.includes('Spotify');
+          } else if (selectedCategory === 'ซีรีส์ / หนัง') {
+            matchCategory =
+              p.name.includes('Netflix') ||
+              p.name.includes('Disney') ||
+              p.name.includes('iQIYI') ||
+              p.name.includes('Viu') ||
+              p.name.includes('Bilibili') ||
+              p.name.includes('WeTV');
+          } else if (selectedCategory === 'ทำงาน / AI') {
+            matchCategory =
+              p.name.includes('Canva') ||
+              p.name.includes('CapCut') ||
+              p.name.includes('ChatGPT');
+          }
+        }
+
+        return matchSearch && matchCategory;
       })
       .sort((a, b) => {
         if (sortBy === 'rating') {
@@ -30,16 +54,22 @@ export const Products: React.FC = () => {
         }
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-  }, [products, searchTerm, sortBy]);
+  }, [products, searchTerm, selectedCategory, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Page Header */}
-      <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b border-pink-100 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">สินค้าทั้งหมด</h1>
+          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs font-bold mb-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>BA STORE Subscriptions</span>
+          </div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight font-heading">
+            แอพพรีเมียมทั้งหมด
+          </h1>
           <p className="text-sm text-slate-500 mt-1">
-            เลือกดูรายการสินค้าและอ่านรีวิวที่ผ่านการยืนยันจากลูกค้าจริง
+            เช็คราคาปลีกสุดคุ้ม พร้อมอ่านรีวิวการใช้งานจริงที่ผ่านการยืนยัน
           </p>
         </div>
 
@@ -49,10 +79,10 @@ export const Products: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="ค้นหาชื่อสินค้า..."
+              placeholder="ค้นหาชื่อแอพ เช่น YouTube, Netflix..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-64"
+              className="pl-9 pr-4 py-2 text-sm rounded-2xl border border-pink-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500 w-full sm:w-64"
             />
           </div>
 
@@ -60,7 +90,7 @@ export const Products: React.FC = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full sm:w-auto px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+              className="w-full sm:w-auto px-3.5 py-2 text-sm rounded-2xl border border-pink-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-pink-500 cursor-pointer font-medium"
             >
               <option value="latest">มาใหม่ล่าสุด</option>
               <option value="rating">คะแนนรีวิวสูงสุด</option>
@@ -69,6 +99,23 @@ export const Products: React.FC = () => {
             </select>
           </div>
         </div>
+      </div>
+
+      {/* Category Filter Pills (Touch Target >= 44px as in DESIGN.md) */}
+      <div className="flex flex-wrap gap-2 pt-1">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`min-h-[44px] px-5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer font-heading ${
+              selectedCategory === cat
+                ? 'bg-pink-600 text-white shadow-xs shadow-pink-200 scale-105'
+                : 'bg-white text-slate-600 hover:bg-pink-50/60 border border-pink-100 hover:text-pink-600'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       {/* Product List Content */}
@@ -83,12 +130,15 @@ export const Products: React.FC = () => {
         <ErrorState message={error} onRetry={refetch} />
       ) : filteredProducts.length === 0 ? (
         <EmptyState
-          icon={<ShoppingBag className="w-7 h-7" />}
-          title="ไม่พบสินค้าที่ตรงกับการค้นหา"
-          description="ลองเปลี่ยนคำค้นหา หรือเรียกดูสินค้าทั้งหมดอีกครั้ง"
+          icon={<ShoppingBag className="w-7 h-7 text-pink-400" />}
+          title="ไม่พบแอพที่ตรงกับการค้นหา"
+          description="ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นเพื่อค้นหาแอพพรีเมียม"
           action={{
-            label: 'ล้างการค้นหา',
-            onClick: () => setSearchTerm(''),
+            label: 'แสดงแอพทั้งหมด',
+            onClick: () => {
+              setSearchTerm('');
+              setSelectedCategory('ทั้งหมด');
+            },
           }}
         />
       ) : (

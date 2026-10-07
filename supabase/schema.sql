@@ -704,15 +704,20 @@ CREATE POLICY "Auth User Upload avatars" ON storage.objects FOR INSERT
     WITH CHECK (bucket_id = 'avatars' AND auth.role() = 'authenticated');
 
 -- ==============================================================================
--- 📊 DEMO / SEED DATA
+-- 📊 DEMO / SEED DATA (BA STORE - Premium Apps & Subscriptions)
 -- ==============================================================================
 INSERT INTO public.products (id, name, description, price, image_url, status)
 VALUES
-    ('a0000000-0000-0000-0000-000000000001', 'Artisan Single Origin Ethiopian Coffee Beans (250g)', 'เมล็ดกาแฟคั่วกลางพรีเมียม โน้ตผลไม้เบอร์รี่ ดอกไม้และซิตรัส คั่วสดใหม่', 450.00, 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&auto=format&fit=crop&q=80', 'active'),
-    ('a0000000-0000-0000-0000-000000000002', 'Wireless Active Noise-Cancelling Headphones Pro', 'หูฟังตัดเสียงรบกวนไร้สาย แบตเตอรี่อึด 40 ชม. เบสแน่น เสียงคมชัดระดับ Hi-Res Audio', 3890.00, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80', 'active'),
-    ('a0000000-0000-0000-0000-000000000003', 'Ergonomic Mechanical Keyboard 75% RGB', 'คีย์บอร์ดแมคคานิคอลไร้สาย สวิตช์ Hot-swappable เชื่อมต่อได้ 3 โหมด ดีไซน์ Ergonomic สบายข้อมือ', 2590.00, 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80', 'active'),
-    ('a0000000-0000-0000-0000-000000000004', 'Smart Fitness Watch AMOLED Titanium', 'นาฬิกาสมาร์ทวอทช์กันน้ำ 50m วัดหัวใจ SpO2 และการนอนหลับ จอสีสดใส สแตนด์บาย 14 วัน', 4990.00, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80', 'active'),
-    ('a0000000-0000-0000-0000-000000000005', 'Ceramic Handcrafted Dripper Set & Server', 'ชุดดริปกาแฟเซรามิกทำมือพร้อมเหยือกแก้วทนความร้อน ดีไซน์มินิมอลสำหรับคนรักกาแฟ Slow Bar', 890.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80', 'active')
+    ('a0000000-0000-0000-0000-000000000001', 'YouTube Premium (ตัดเมลลูกค้า)', 'ใช้อีเมลส่วนตัว ไม่ต้องย้ายเมล ไม่มีโฆษณาคั่น ฟังเพลงจอดับได้ ดูได้ทุกอุปกรณ์ ปลอดภัย ได้วันครบ', 10.00, '/logos/youtube.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000002', 'Netflix 4K Ultra HD (จอส่วนตัว 30 วัน)', 'รับชมพร้อมกันได้ 1 จอ ภาพคมชัดระดับสูงสุด Ultra HD 4K + Spatial Audio จอส่วนตัวมีรหัสล็อคโปรไฟล์ ไม่เด้ง', 129.00, '/logos/netflix.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000003', 'Disney+ Hotstar (30 วัน)', '1 จอ ดูได้ทุกอุปกรณ์ ความคมชัด Full HD / 4K หนัง Marvel, Disney, Pixar ครบทุกเรื่อง บัญชีแท้ ดูแลตลอดอายุการใช้งาน', 89.00, '/logos/disney.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000004', 'Canva Pro (ดึงเข้าทีมโปร 30 วัน)', 'ใช้อีเมลตัวเอง ปลอดภัย งานไม่หาย ปลดล็อคเทมเพลตและฟอนต์ระดับ Pro กว่า 100 ล้านรายการ ลบพื้นหลังในคลิกเดียว', 39.00, '/logos/canva.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000005', 'Spotify Premium (30 วัน)', 'ดึงเข้าครอบครัว/เมลเดิม ฟังเพลงไม่มีโฆษณาคั่น คุณภาพเสียงระดับ Very High (320kbps) ข้ามเพลงและฟังออฟไลน์ได้ไม่จำกัด', 49.00, '/logos/spotify.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000006', 'iQIYI มาตรฐาน (30 วัน)', 'ดูพร้อมกันได้ 2 อุปกรณ์ ความคมชัด 1080P Full HD ซีรีส์จีน ซีรีส์เกาหลี อนิเมะ ไม่มีโฆษณาคั่น ระบบเสียง Dolby', 56.00, '/logos/iqiyi.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000007', 'Viu Premium (30 วัน)', 'ดูพร้อมกันได้ 3 อุปกรณ์ Full HD 1080p ซีรีส์เกาหลี พากย์ไทย และซับไทยไวที่สุด ดูออฟไลน์ได้ไม่จำกัด บัญชีแท้ 100%', 45.00, '/logos/viu.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000008', 'CapCut Pro (30 วัน)', 'ตัดต่อวิดีโอระดับโปร ปลดล็อคเอฟเฟกต์ ฟิลเตอร์ และฟอนต์พรีเมียม ส่งออกความละเอียดสูง ไม่มีลายน้ำ', 49.00, '/logos/capcut.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000009', 'ChatGPT Plus / Team (30 วัน)', 'เข้าถึงโมเดล GPT-4o ความเร็วสูง ประมวลผลเอกสาร วิเคราะห์โค้ด และสร้างภาพด้วย DALL·E 3 ไม่จำกัดความคิดสร้างสรรค์', 120.00, '/logos/chatgpt.png', 'active'),
+    ('a0000000-0000-0000-0000-000000000010', 'Bilibili TV Premium (30 วัน)', 'รับชมอนิเมะถูกลิขสิทธิ์ความคมชัด 4K อัปเดตตอนใหม่พร้อมญี่ปุ่น ไม่มีโฆษณาคั่น รองรับแอปบนสมาร์ททีวี', 35.00, '/logos/bilibili_tv.png', 'active')
 ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
     description = EXCLUDED.description,

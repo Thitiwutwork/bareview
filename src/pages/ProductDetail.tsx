@@ -140,18 +140,21 @@ export const ProductDetail: React.FC = () => {
       </Link>
 
       {/* Product Overview Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xs">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 bg-white rounded-3xl p-6 sm:p-10 border border-pink-100 shadow-xs">
         {/* Product Image */}
-        <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 relative">
+        <div className="aspect-square rounded-3xl p-8 bg-gradient-to-tr from-pink-50 via-white to-pink-50/30 border border-pink-100 flex items-center justify-center relative overflow-hidden">
           {product.image_url ? (
             <img
               src={product.image_url}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-3/4 h-3/4 object-contain drop-shadow-md"
+              onError={(e) => {
+                e.currentTarget.src = '/images/logo.jpg';
+              }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-300">
-              <ShoppingBag className="w-16 h-16 stroke-[1.5]" />
+            <div className="w-full h-full flex items-center justify-center text-pink-300">
+              <ShoppingBag className="w-20 h-20 stroke-[1.5]" />
             </div>
           )}
         </div>
@@ -161,10 +164,10 @@ export const ProductDetail: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <VerifiedBadge size="sm" variant="badge" />
-              <span className="text-xs text-slate-500">สินค้ารับรองคุณภาพ</span>
+              <span className="text-xs text-slate-500">บัญชีแท้ 100% รับประกันการใช้งาน</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight font-heading">
               {product.name}
             </h1>
 
@@ -178,54 +181,69 @@ export const ProductDetail: React.FC = () => {
               </span>
             </div>
 
-            <div className="text-3xl font-black text-slate-900 pt-2">
+            <div className="text-3xl font-black text-pink-600 pt-1 font-heading">
               {formatCurrency(product.price)}
+              <span className="text-xs text-slate-400 font-normal ml-2 font-sans">
+                (ราคาปลีกสุดคุ้ม)
+              </span>
             </div>
 
-            <div className="border-t border-slate-100 pt-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                รายละเอียดสินค้า
+            <div className="border-t border-pink-50 pt-4">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 font-heading">
+                รายละเอียดแพ็กเกจ
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
                 {product.description || 'ไม่มีรายละเอียดเพิ่มเติม'}
               </p>
             </div>
+
+            {/* Quick Order via LINE Action */}
+            <div className="pt-2">
+              <a
+                href={`https://line.me/ti/p/~@bastore?text=${encodeURIComponent('สนใจสั่งซื้อ ' + product.name)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#06C755] hover:bg-[#05b34c] text-white rounded-2xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                <span>สั่งซื้อแพ็กเกจนี้ผ่าน LINE (@bastore)</span>
+              </a>
+            </div>
           </div>
 
           {/* Verification Eligibility Banner */}
-          <div className="pt-4 border-t border-slate-200">
+          <div className="pt-4 border-t border-pink-100">
             {eligibleOrderId ? (
               <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                   <div>
-                    <p className="text-xs font-bold text-emerald-900">
-                      คุณมีสิทธิ์เขียนรีวิวสำหรับสินค้านี้!
+                    <p className="text-xs font-bold text-emerald-900 font-heading">
+                      คุณมีสิทธิ์เขียนรีวิวสำหรับแอพนี้!
                     </p>
                     <p className="text-[11px] text-emerald-700">
-                      พบคำสั่งซื้อที่เสร็จสมบูรณ์แล้วในบัญชีของคุณ
+                      พบคำสั่งซื้อที่เสร็จสมบูรณ์แล้วในระบบ
                     </p>
                   </div>
                 </div>
                 <Link
                   to={`/review?product_id=${product.id}&order_id=${eligibleOrderId}`}
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors whitespace-nowrap cursor-pointer"
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors whitespace-nowrap cursor-pointer"
                 >
                   <PenSquare className="w-3.5 h-3.5" />
                   <span>เขียนรีวิวเลย</span>
                 </Link>
               </div>
             ) : user ? (
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 flex items-start gap-2.5 text-xs">
-                <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-2xl bg-pink-50/50 border border-pink-100 text-slate-600 flex items-start gap-2.5 text-xs">
+                <Info className="w-4 h-4 text-pink-500 shrink-0 mt-0.5" />
                 <p>
-                  เฉพาะลูกค้าที่เคยสั่งซื้อสินค้านี้และคำสั่งซื้อเสร็จสมบูรณ์แล้วเท่านั้นจึงจะสามารถเขียนรีวิวได้
+                  เฉพาะลูกค้าที่เคยสั่งซื้อสินค้านี้และคำสั่งซื้อเสร็จสมบูรณ์แล้วเท่านั้นจึงจะสามารถเขียนรีวิวได้ (No Transaction = No Review)
                 </p>
               </div>
             ) : (
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 flex items-center justify-between gap-2 text-xs">
+              <div className="p-3.5 rounded-2xl bg-pink-50/50 border border-pink-100 text-slate-600 flex items-center justify-between gap-2 text-xs">
                 <span>เข้าสู่ระบบเพื่อตรวจสอบสิทธิ์การเขียนรีวิว</span>
-                <Link to="/login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+                <Link to="/login" className="font-bold text-pink-600 hover:text-pink-700">
                   เข้าสู่ระบบ &rarr;
                 </Link>
               </div>
@@ -236,11 +254,11 @@ export const ProductDetail: React.FC = () => {
 
       {/* Ratings & Reviews Section */}
       <div className="space-y-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-pink-100 pb-6">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">รีวิวและความคิดเห็น</h2>
+            <h2 className="text-2xl font-black text-slate-900 font-heading">รีวิวจากลูกค้าตัวจริง</h2>
             <p className="text-xs text-slate-500 mt-1">
-              ความคิดเห็นทั้งหมดจากผู้ซื้อที่มีรายการสั่งซื้อจริงในระบบ
+              ความคิดเห็นทั้งหมดจากผู้ซื้อที่มีรายการสั่งซื้อจริงในระบบ 100%
             </p>
           </div>
 
@@ -251,40 +269,40 @@ export const ProductDetail: React.FC = () => {
             </span>
             <button
               onClick={() => setFilterType('latest')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                 filterType === 'latest'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-pink-600 text-white'
+                  : 'bg-white text-slate-600 hover:bg-pink-50 border border-pink-100'
               }`}
             >
               ล่าสุด
             </button>
             <button
               onClick={() => setFilterType('highest')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                 filterType === 'highest'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-pink-600 text-white'
+                  : 'bg-white text-slate-600 hover:bg-pink-50 border border-pink-100'
               }`}
             >
               คะแนนสูงสุด
             </button>
             <button
               onClick={() => setFilterType('lowest')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                 filterType === 'lowest'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-pink-600 text-white'
+                  : 'bg-white text-slate-600 hover:bg-pink-50 border border-pink-100'
               }`}
             >
               คะแนนต่ำสุด
             </button>
             <button
               onClick={() => setFilterType('verified_only')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                 filterType === 'verified_only'
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  : 'bg-white text-slate-600 hover:bg-emerald-50 border border-emerald-200'
               }`}
             >
               ✓ Verified Only

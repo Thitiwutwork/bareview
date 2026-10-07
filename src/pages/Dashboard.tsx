@@ -183,16 +183,16 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-emerald-800 to-teal-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-r from-pink-600 via-rose-600 to-pink-700 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-700/60 border border-emerald-500/50 text-xs font-semibold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/60 border border-pink-300/40 text-xs font-semibold">
             <ShieldCheck className="w-4 h-4 text-emerald-300" />
-            <span>Customer Portal</span>
+            <span>BA STORE Customer Portal</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight font-heading">
             สวัสดี, {profile?.full_name || user?.email}
           </h1>
-          <p className="text-emerald-100 text-xs sm:text-sm leading-relaxed">
+          <p className="text-pink-100 text-xs sm:text-sm leading-relaxed">
             ยินดีต้อนรับสู่แดชบอร์ดตรวจสอบสิทธิ์การรีวิว คุณสามารถดูประวัติคำสั่งซื้อและเขียนรีวิวที่มีเครื่องหมาย Verified Customer ได้ที่นี่
           </p>
         </div>

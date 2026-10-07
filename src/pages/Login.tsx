@@ -107,7 +107,7 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-sm font-bold shadow-sm shadow-pink-200 transition-colors disabled:opacity-50 cursor-pointer font-heading"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>เข้าสู่ระบบ</span>
@@ -117,7 +117,7 @@ export const Login: React.FC = () => {
         <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-500 space-y-2">
           <p>
             ยังไม่มีบัญชีผู้ใช้งาน?{' '}
-            <Link to="/register" className="text-emerald-600 font-semibold hover:underline">
+            <Link to="/register" className="text-pink-600 font-bold hover:underline">
               สมัครสมาชิกที่นี่
             </Link>
           </p>

@@ -14,54 +14,67 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const reviewCount = product.review_count || 0;
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col">
-      {/* Product Image */}
-      <div className="relative aspect-4/3 w-full bg-slate-100 overflow-hidden">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
-            <ShoppingBag className="w-12 h-12 stroke-[1.5]" />
+    <div className="group bg-white rounded-3xl border border-pink-100/80 p-5 shadow-xs hover:shadow-md hover:border-pink-300 transition-all duration-300 flex flex-col justify-between">
+      <div>
+        {/* App Logo / Product Image */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="w-16 h-16 rounded-2xl p-2 bg-gradient-to-tr from-pink-50 to-white border border-pink-100 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+            {product.image_url ? (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-full object-contain"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/logo.jpg';
+                }}
+              />
+            ) : (
+              <ShoppingBag className="w-8 h-8 text-pink-400 stroke-[1.5]" />
+            )}
           </div>
-        )}
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs text-xs font-semibold px-2.5 py-1 rounded-full text-slate-700 shadow-xs">
-          {formatCurrency(product.price)}
+
+          <div className="text-right">
+            <span className="text-lg font-black text-pink-600 font-heading block">
+              {formatCurrency(product.price)}
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">ราคาปลีกสุดคุ้ม</span>
+          </div>
+        </div>
+
+        {/* Product Title & Info */}
+        <div className="space-y-1.5">
+          <h3 className="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-pink-600 transition-colors font-heading">
+            {product.name}
+          </h3>
+
+          {product.description && (
+            <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+              {product.description}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-semibold text-slate-900 line-clamp-1 group-hover:text-emerald-700 transition-colors">
-          {product.name}
-        </h3>
-
-        {product.description && (
-          <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed">
-            {product.description}
-          </p>
-        )}
-
-        <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-100">
-          <div className="flex items-center gap-1.5">
-            <RatingStars rating={avgRating} size="sm" />
-            <span className="text-xs text-slate-500 font-medium">
-              ({reviewCount})
-            </span>
-          </div>
-
-          <Link
-            to={`/products/${product.id}`}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-800 transition-colors group-hover:translate-x-0.5"
-          >
-            <span>ดูรายละเอียด</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+      {/* Ratings, Verified Status & Button */}
+      <div className="mt-5 pt-3.5 border-t border-pink-50 flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <RatingStars rating={avgRating} size="sm" />
+          <span className="text-xs font-semibold text-slate-700">
+            {avgRating > 0 ? avgRating.toFixed(1) : '5.0'}
+          </span>
+          <span className="text-[11px] text-slate-400">
+            ({reviewCount} รีวิว)
+          </span>
         </div>
+
+        <Link
+          to={`/products/${product.id}`}
+          className="inline-flex items-center gap-1 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl text-xs font-bold transition-all group-hover:translate-x-0.5 cursor-pointer"
+        >
+          <span>ดูรีวิว</span>
+          <ArrowRight className="w-3.5 h-3.5 text-pink-500" />
+        </Link>
       </div>
     </div>
   );

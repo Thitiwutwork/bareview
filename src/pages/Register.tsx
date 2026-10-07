@@ -61,10 +61,10 @@ export const Register: React.FC = () => {
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-12 h-12 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center mx-auto shadow-inner">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">สมัครสมาชิกใหม่</h1>
+          <h1 className="text-2xl font-bold font-heading text-slate-900 tracking-tight">สมัครสมาชิกใหม่</h1>
           <p className="text-xs text-slate-500">
             สร้างบัญชีเพื่อสะสมรายการสั่งซื้อและเขียนรีวิวที่มีสิทธิ์ยืนยันตัวตน
           </p>
@@ -95,7 +95,7 @@ export const Register: React.FC = () => {
                 type="text"
                 {...register('fullName')}
                 placeholder="สมชาย ใจดี"
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
             {errors.fullName && (
@@ -113,7 +113,7 @@ export const Register: React.FC = () => {
                 type="email"
                 {...register('email')}
                 placeholder="customer@example.com"
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
             {errors.email && (
@@ -131,7 +131,7 @@ export const Register: React.FC = () => {
                 type="password"
                 {...register('password')}
                 placeholder="อย่างน้อย 8 ตัวอักษร"
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
             {errors.password && (
@@ -149,7 +149,7 @@ export const Register: React.FC = () => {
                 type="password"
                 {...register('confirmPassword')}
                 placeholder="กรอกรหัสผ่านอีกครั้ง"
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
             {errors.confirmPassword && (
@@ -160,7 +160,7 @@ export const Register: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>สมัครสมาชิก</span>
@@ -170,7 +170,7 @@ export const Register: React.FC = () => {
         <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
           <p>
             มีบัญชีผู้ใช้งานอยู่แล้ว?{' '}
-            <Link to="/login" className="text-emerald-600 font-semibold hover:underline">
+            <Link to="/login" className="text-pink-600 font-semibold hover:underline">
               เข้าสู่ระบบที่นี่
             </Link>
           </p>

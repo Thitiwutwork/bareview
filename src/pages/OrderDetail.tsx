@@ -114,9 +114,9 @@ export const OrderDetail: React.FC = () => {
           {isCompleted && (
             <button
               onClick={handleOpenQR}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-pink-50 hover:bg-pink-100 text-pink-800 border border-pink-200 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
             >
-              <QrCode className="w-4 h-4 text-emerald-600" />
+              <QrCode className="w-4 h-4 text-pink-600" />
               <span>QR Code สำหรับรีวิว</span>
             </button>
           )}
@@ -211,7 +211,7 @@ export const OrderDetail: React.FC = () => {
                     ) : (
                       <Link
                         to={`/review?product_id=${item.product_id}&order_id=${order.id}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                       >
                         <PenSquare className="w-3.5 h-3.5" />
                         <span>เขียนรีวิว</span>
@@ -231,7 +231,7 @@ export const OrderDetail: React.FC = () => {
         {/* Total Summary */}
         <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-sm font-bold text-slate-900">
           <span>ยอดรวมทั้งสิ้น (Total Amount)</span>
-          <span className="text-lg font-black text-emerald-700">
+          <span className="text-lg font-black text-pink-600 font-heading">
             {formatCurrency(order.total_amount)}
           </span>
         </div>
