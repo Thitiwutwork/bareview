@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { 
   Star, 
   ShoppingBag, 
@@ -21,6 +21,7 @@ import { supabase } from '../lib/supabase';
 export const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const location = useLocation();
   const { product, reviews, isLoading, error, refetch } = useProductDetail(id);
 
   // Review Filter states
@@ -243,7 +244,7 @@ export const ProductDetail: React.FC = () => {
             ) : (
               <div className="p-3.5 rounded-2xl bg-pink-50/50 border border-pink-100 text-slate-600 flex items-center justify-between gap-2 text-xs">
                 <span>เข้าสู่ระบบเพื่อตรวจสอบสิทธิ์การเขียนรีวิว</span>
-                <Link to="/login" className="font-bold text-pink-600 hover:text-pink-700">
+                <Link to="/login" state={{ from: location }} className="font-bold text-pink-600 hover:text-pink-700">
                   เข้าสู่ระบบ &rarr;
                 </Link>
               </div>

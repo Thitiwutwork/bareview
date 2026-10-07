@@ -9,7 +9,7 @@ export function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500 selection:text-white">
+        <div className="min-h-screen flex flex-col bg-[#FDF5F8] text-[#374151] font-sans selection:bg-pink-200 selection:text-pink-900">
           <SupabaseAlertBanner />
           <Navbar />
           <main className="flex-1">

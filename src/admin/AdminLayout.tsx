@@ -72,7 +72,7 @@ export const AdminLayout: React.FC = () => {
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-5 h-5 text-amber-400" />
-              <span className="font-bold text-sm tracking-wide">TrustReview Admin Portal</span>
+              <span className="font-bold text-sm tracking-wide">BA STORE Admin Portal</span>
               <span className="bg-amber-400/20 text-amber-300 text-[10px] font-mono px-2 py-0.5 rounded uppercase">
                 Admin Mode
               </span>

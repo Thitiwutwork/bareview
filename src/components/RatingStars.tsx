@@ -51,7 +51,7 @@ export const RatingStars: React.FC<RatingStarsProps> = ({
               className={cn(
                 'transition-transform',
                 interactive
-                  ? 'cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded p-0.5'
+                  ? 'cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-lg p-1.5 sm:p-1'
                   : 'cursor-default p-0'
               )}
               aria-label={interactive ? `${starValue} จาก ${maxRating} ดาว` : undefined}

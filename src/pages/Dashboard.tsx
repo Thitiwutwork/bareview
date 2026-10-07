@@ -198,30 +198,30 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Testing Order Generator Button in Corner */}
-        <div className="mt-6 pt-4 border-t border-emerald-700/60 flex flex-wrap items-center gap-3 relative z-10">
-          <span className="text-xs text-emerald-200 font-semibold">เครื่องมือทดสอบระบบ:</span>
+        <div className="mt-6 pt-4 border-t border-pink-300/40 flex flex-wrap items-center gap-3 relative z-10">
+          <span className="text-xs text-pink-100 font-semibold">เครื่องมือทดสอบระบบ:</span>
           <button
             onClick={() => handleCreateTestOrder('completed')}
             disabled={isCreatingDemoOrder}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 border border-white/30"
             title="ทดสอบ Scenario 3: คำสั่งซื้อ Completed -> มีสิทธิ์รีวิว"
           >
-            <PlusCircle className="w-3.5 h-3.5" />
+            <PlusCircle className="w-3.5 h-3.5 text-emerald-300" />
             <span>+ สร้าง Order ที่สำเร็จแล้ว (Completed)</span>
           </button>
           <button
             onClick={() => handleCreateTestOrder('pending')}
             disabled={isCreatingDemoOrder}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-black/30 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 border border-white/20"
             title="ทดสอบ Scenario 2: คำสั่งซื้อ Pending -> ต้องไม่มีสิทธิ์รีวิว"
           >
-            <Clock className="w-3.5 h-3.5" />
+            <Clock className="w-3.5 h-3.5 text-amber-300" />
             <span>+ สร้าง Order รอดำเนินการ (Pending)</span>
           </button>
         </div>
 
         {demoOrderMessage && (
-          <div className="mt-3 p-2.5 rounded-lg bg-white/10 backdrop-blur-xs text-xs text-emerald-200 flex items-center gap-2">
+          <div className="mt-3 p-2.5 rounded-lg bg-white/15 backdrop-blur-xs text-xs text-white flex items-center gap-2 border border-white/20">
             <CheckCircle className="w-4 h-4 text-emerald-300 shrink-0" />
             <span>{demoOrderMessage}</span>
           </div>
