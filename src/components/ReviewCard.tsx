@@ -128,10 +128,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           {user && !isOwner && (
             <button
               onClick={() => setReportModalOpen(true)}
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+              className="p-2 sm:p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer touch-manipulation"
               title="รายงานรีวิวนี้"
+              aria-label="รายงานรีวิวนี้"
             >
-              <Flag className="w-3.5 h-3.5" />
+              <Flag className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             </button>
           )}
 

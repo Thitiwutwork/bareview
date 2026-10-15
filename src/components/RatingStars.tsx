@@ -32,6 +32,17 @@ export const RatingStars: React.FC<RatingStarsProps> = ({
 
   const currentRating = hoverRating !== null ? hoverRating : rating;
 
+  const handleKeyDown = (e: React.KeyboardEvent, starValue: number) => {
+    if (!interactive || !onRatingChange) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      onRatingChange(Math.min(maxRating, starValue + 1));
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      onRatingChange(Math.max(1, starValue - 1));
+    }
+  };
+
   return (
     <div className={cn('inline-flex items-center gap-1', className)}>
       <div className="flex items-center gap-0.5" role={interactive ? 'radiogroup' : undefined}>
@@ -44,8 +55,11 @@ export const RatingStars: React.FC<RatingStarsProps> = ({
             <button
               key={starValue}
               type="button"
+              role={interactive ? 'radio' : undefined}
+              aria-checked={interactive ? starValue === rating : undefined}
               disabled={!interactive}
               onClick={() => interactive && onRatingChange?.(starValue)}
+              onKeyDown={(e) => handleKeyDown(e, starValue)}
               onMouseEnter={() => interactive && setHoverRating(starValue)}
               onMouseLeave={() => interactive && setHoverRating(null)}
               className={cn(

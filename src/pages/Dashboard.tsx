@@ -6,9 +6,7 @@ import {
   PenSquare, 
   Star, 
   ShoppingBag, 
-  Clock, 
   ArrowRight,
-  PlusCircle,
   ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -38,8 +36,6 @@ export const Dashboard: React.FC = () => {
   const [myReviews, setMyReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewableItems, setReviewableItems] = useState<ReviewableItem[]>([]);
-  const [isCreatingDemoOrder, setIsCreatingDemoOrder] = useState(false);
-  const [demoOrderMessage, setDemoOrderMessage] = useState<string | null>(null);
 
   // Fetch reviews written by current user
   const fetchMyReviews = async () => {
@@ -104,68 +100,7 @@ export const Dashboard: React.FC = () => {
     setReviewableItems(items);
   }, [orders, myReviews]);
 
-  // Quick helper to create real orders in Supabase for testing (Pending or Completed)
-  const handleCreateTestOrder = async (orderStatus: 'pending' | 'completed') => {
-    if (!user) return;
-    setIsCreatingDemoOrder(true);
-    setDemoOrderMessage(null);
 
-    try {
-      // Pick the first available product
-      const { data: prods } = await supabase.from('products').select('*').limit(2);
-      if (!prods || prods.length === 0) {
-        setDemoOrderMessage('ไม่พบสินค้าในระบบ กรุณารัน schema.sql ก่อน');
-        return;
-      }
-
-      const selectedProd = prods[0];
-      const ordNum = `ORD-${Date.now().toString().slice(-6)}`;
-
-      // 1. Insert order
-      const { data: newOrder, error: ordErr } = await supabase
-        .from('orders')
-        .insert({
-          order_number: ordNum,
-          user_id: user.id,
-          total_amount: selectedProd.price,
-          status: orderStatus,
-          payment_status: orderStatus === 'completed' ? 'paid' : 'pending',
-          completed_at: orderStatus === 'completed' ? new Date().toISOString() : null,
-        })
-        .select()
-        .single();
-
-      if (ordErr) throw ordErr;
-
-      // 2. Insert order items
-      const { error: itemErr } = await supabase.from('order_items').insert({
-        order_id: newOrder.id,
-        product_id: selectedProd.id,
-        quantity: 1,
-        price: selectedProd.price,
-      });
-
-      if (itemErr) throw itemErr;
-
-      // 3. Insert audit log
-      await supabase.from('audit_logs').insert({
-        user_id: user.id,
-        action: 'CREATE_ORDER',
-        description: `Created test order ${ordNum} with status ${orderStatus}`,
-      });
-
-      setDemoOrderMessage(
-        `สร้างคำสั่งซื้อ ${ordNum} (สถานะ: ${orderStatus}) เรียบร้อยแล้ว!`
-      );
-      await refetchOrders();
-      await fetchMyReviews();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการสร้างคำสั่งซื้อ';
-      setDemoOrderMessage(`Error: ${msg}`);
-    } finally {
-      setIsCreatingDemoOrder(false);
-    }
-  };
 
   const handleDeleteReview = async (reviewId: string) => {
     if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรีวิวนี้?')) return;
@@ -196,36 +131,6 @@ export const Dashboard: React.FC = () => {
             ยินดีต้อนรับสู่แดชบอร์ดตรวจสอบสิทธิ์การรีวิว คุณสามารถดูประวัติคำสั่งซื้อและเขียนรีวิวที่มีเครื่องหมาย Verified Customer ได้ที่นี่
           </p>
         </div>
-
-        {/* Quick Testing Order Generator Button in Corner */}
-        <div className="mt-6 pt-4 border-t border-pink-300/40 flex flex-wrap items-center gap-3 relative z-10">
-          <span className="text-xs text-pink-100 font-semibold">เครื่องมือทดสอบระบบ:</span>
-          <button
-            onClick={() => handleCreateTestOrder('completed')}
-            disabled={isCreatingDemoOrder}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 border border-white/30"
-            title="ทดสอบ Scenario 3: คำสั่งซื้อ Completed -> มีสิทธิ์รีวิว"
-          >
-            <PlusCircle className="w-3.5 h-3.5 text-emerald-300" />
-            <span>+ สร้าง Order ที่สำเร็จแล้ว (Completed)</span>
-          </button>
-          <button
-            onClick={() => handleCreateTestOrder('pending')}
-            disabled={isCreatingDemoOrder}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-black/30 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 border border-white/20"
-            title="ทดสอบ Scenario 2: คำสั่งซื้อ Pending -> ต้องไม่มีสิทธิ์รีวิว"
-          >
-            <Clock className="w-3.5 h-3.5 text-amber-300" />
-            <span>+ สร้าง Order รอดำเนินการ (Pending)</span>
-          </button>
-        </div>
-
-        {demoOrderMessage && (
-          <div className="mt-3 p-2.5 rounded-lg bg-white/15 backdrop-blur-xs text-xs text-white flex items-center gap-2 border border-white/20">
-            <CheckCircle className="w-4 h-4 text-emerald-300 shrink-0" />
-            <span>{demoOrderMessage}</span>
-          </div>
-        )}
       </div>
 
       {/* 4 Stats Cards */}

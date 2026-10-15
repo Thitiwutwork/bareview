@@ -141,8 +141,8 @@ export const AdminTokens: React.FC = () => {
 
     if (res.success && res.data) {
       const token = res.data.token;
-      const origin = window.location.origin;
-      const reviewUrl = `${origin}/review?token=${token}`;
+      const baseUrl = (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/$/, '');
+      const reviewUrl = `${baseUrl}/review?token=${token}`;
 
       const lineMessage = `ขอบคุณที่อุดหนุน ${prodName} กับร้าน BA STORE นะคะ ❤️\n\nรบกวนลูกค้ารีวิวบริการเพื่อสะสมความน่าเชื่อถือและรับประกันตลอดอายุการใช้งานได้ที่ลิงก์นี้เลยค่า:\n👉 ${reviewUrl}\n\n(สิทธิ์รีวิวลูกค้าจริง Verified Customer ✓ | ลิงก์นี้ใช้ได้ ${expiryDays} วันนะคะ)`;
 
@@ -418,7 +418,7 @@ export const AdminTokens: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center p-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors"
-                      title="ทดสอบเปิดหน้ารีวิว"
+                      title="เปิดดูหน้ารีวิว"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
@@ -469,7 +469,8 @@ export const AdminTokens: React.FC = () => {
                 {tokens.map((t) => {
                   const prod = t.orders?.order_items?.[0]?.products?.name || 'สินค้า';
                   const isExpired = new Date(t.expires_at).getTime() < Date.now();
-                  const reviewUrl = `${window.location.origin}/review?token=${t.token}`;
+                  const baseUrl = (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/$/, '');
+                  const reviewUrl = `${baseUrl}/review?token=${t.token}`;
 
                   return (
                     <div key={t.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

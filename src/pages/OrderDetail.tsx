@@ -12,42 +12,14 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useOrderDetail } from '../hooks/useOrders';
-import { useAuth } from '../hooks/useAuth';
 import { LoadingSpinner, ErrorState } from '../components/Loading';
 import { QRCodeModal } from '../components/QRCodeModal';
 import { formatCurrency, formatDateTime } from '../lib/utils';
-import { supabase } from '../lib/supabase';
 
 export const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { isAdmin } = useAuth();
   const { order, items, reviewToken, isLoading, error, refetch, requestNewToken } = useOrderDetail(id);
   const [qrModalOpen, setQrModalOpen] = useState(false);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-
-  // Admin shortcut to toggle order completion for testing
-  const handleToggleCompleted = async () => {
-    if (!order) return;
-    setIsUpdatingStatus(true);
-    try {
-      const nextStatus = order.status === 'completed' ? 'pending' : 'completed';
-      const { error: updErr } = await supabase
-        .from('orders')
-        .update({
-          status: nextStatus,
-          payment_status: nextStatus === 'completed' ? 'paid' : 'pending',
-          completed_at: nextStatus === 'completed' ? new Date().toISOString() : null,
-        })
-        .eq('id', order.id);
-
-      if (updErr) throw updErr;
-      await refetch();
-    } catch (err) {
-      console.error('handleToggleCompleted error:', err);
-    } finally {
-      setIsUpdatingStatus(false);
-    }
-  };
 
   const handleOpenQR = async () => {
     if (!reviewToken) {
@@ -142,21 +114,6 @@ export const OrderDetail: React.FC = () => {
           </div>
         )}
 
-        {/* Admin Debug / Test Controls */}
-        {isAdmin && (
-          <div className="p-3 bg-slate-50 rounded-xl border border-dashed border-slate-300 flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-mono">
-              [Admin Control: สลับสถานะ Order เพื่อทดสอบเงื่อนไข]
-            </span>
-            <button
-              onClick={handleToggleCompleted}
-              disabled={isUpdatingStatus}
-              className="px-3 py-1 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              {isCompleted ? 'เปลี่ยนเป็น Pending' : 'เปลี่ยนเป็น Completed'}
-            </button>
-          </div>
-        )}
 
         {/* Order Items Table */}
         <div className="space-y-4">
